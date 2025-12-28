@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<!--
+    IoT Sensor Dataset - Demo Page
+    Website: https://rskworld.in
+    Email: help@rskworld.in
+    Phone: +91 93305 39277
+    Author: RSK World
+-->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IoT Sensor Dataset - RSK World</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .header-section {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            transition: transform 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px 15px 0 0 !important;
+            padding: 1.5rem;
+        }
+        .sensor-badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            margin: 0.25rem;
+            font-size: 0.9rem;
+        }
+        .badge-temp { background: #ff6b6b; color: white; }
+        .badge-humidity { background: #4ecdc4; color: white; }
+        .badge-pressure { background: #45b7d1; color: white; }
+        .badge-motion { background: #f9ca24; color: #333; }
+        .btn-purple { background: #6f42c1; color: white; }
+        .btn-purple:hover { background: #5a32a3; color: white; }
+        .stats-card {
+            text-align: center;
+            padding: 1.5rem;
+        }
+        .stats-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+        .footer {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Section -->
+    <div class="header-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="mb-2"><i class="fas fa-clock text-success"></i> IoT Sensor Dataset</h1>
+                    <p class="lead text-muted">Multi-sensor IoT data for analytics, anomaly detection, and sensor fusion</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <a href="https://rskworld.in" class="btn btn-outline-primary" target="_blank">
+                        <i class="fas fa-globe"></i> Visit RSK World
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container my-5">
+        <!-- Dataset Info -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3 class="mb-0"><i class="fas fa-info-circle"></i> Dataset Information</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5>Category: <span class="badge bg-primary">Time Series Data</span></h5>
+                        <h5>Difficulty: <span class="badge bg-danger">Advanced</span></h5>
+                        <p class="mt-3"><strong>Description:</strong></p>
+                        <p>This dataset contains multi-sensor IoT data with temperature, humidity, pressure, motion, and other sensor readings over time. Perfect for IoT analytics, anomaly detection, predictive maintenance, and sensor fusion applications.</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h5>Technologies:</h5>
+                        <span class="badge bg-secondary sensor-badge">CSV</span>
+                        <span class="badge bg-secondary sensor-badge">JSON</span>
+                        <span class="badge bg-secondary sensor-badge">Pandas</span>
+                        <span class="badge bg-secondary sensor-badge">Time Series</span>
+                        <h5 class="mt-4">Features:</h5>
+                        <ul>
+                            <li>Multi-sensor data</li>
+                            <li>Temporal patterns</li>
+                            <li>Anomaly labels</li>
+                            <li>Multiple devices</li>
+                            <li>Sensor fusion ready</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card stats-card">
+                    <div class="stats-value" id="totalReadings">0</div>
+                    <div class="text-muted">Total Readings</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stats-card">
+                    <div class="stats-value" id="totalDevices">0</div>
+                    <div class="text-muted">Devices</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stats-card">
+                    <div class="stats-value" id="avgTemp">0°C</div>
+                    <div class="text-muted">Avg Temperature</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stats-card">
+                    <div class="stats-value" id="anomalies">0</div>
+                    <div class="text-muted">Anomalies</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-chart-line"></i> Temperature & Humidity Over Time</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="tempHumidityChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-chart-area"></i> Pressure Readings</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="pressureChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-chart-pie"></i> Sensor Distribution by Device</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="deviceChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-exclamation-triangle"></i> Anomaly Detection</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="anomalyChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Preview -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-table"></i> Data Preview</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover" id="dataTable">
+                        <thead>
+                            <tr>
+                                <th>Timestamp</th>
+                                <th>Device ID</th>
+                                <th>Temperature (°C)</th>
+                                <th>Humidity (%)</th>
+                                <th>Pressure (hPa)</th>
+                                <th>Motion</th>
+                                <th>Anomaly</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Download Section -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-download"></i> Download Dataset</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Available Formats:</h6>
+                        <a href="data/iot_sensors.csv" class="btn btn-primary me-2" download>
+                            <i class="fas fa-file-csv"></i> Download CSV
+                        </a>
+                        <a href="data/iot_sensors.json" class="btn btn-success me-2" download>
+                            <i class="fas fa-file-code"></i> Download JSON
+                        </a>
+                        <a href="iot-sensors.zip" class="btn btn-warning" download>
+                            <i class="fas fa-file-archive"></i> Download ZIP
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Python Analysis Scripts:</h6>
+                        <a href="scripts/analyze_sensors.py" class="btn btn-info me-2 mb-2" download>
+                            <i class="fab fa-python"></i> Analysis Script
+                        </a>
+                        <a href="scripts/anomaly_detection.py" class="btn btn-info me-2 mb-2" download>
+                            <i class="fas fa-bug"></i> Anomaly Detection
+                        </a>
+                        <a href="scripts/ml_prediction.py" class="btn btn-danger me-2 mb-2" download>
+                            <i class="fas fa-brain"></i> ML Prediction
+                        </a>
+                        <a href="scripts/sensor_fusion.py" class="btn btn-purple me-2 mb-2" download>
+                            <i class="fas fa-project-diagram"></i> Sensor Fusion
+                        </a>
+                        <a href="scripts/real_time_simulator.py" class="btn btn-warning me-2 mb-2" download>
+                            <i class="fas fa-stream"></i> Real-Time Simulator
+                        </a>
+                        <a href="scripts/api_server.py" class="btn btn-dark mb-2" download>
+                            <i class="fas fa-server"></i> API Server
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Advanced Features Section -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-rocket"></i> Advanced Features</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100 border-primary">
+                            <div class="card-body">
+                                <h6 class="card-title text-primary">
+                                    <i class="fas fa-brain"></i> Machine Learning
+                                </h6>
+                                <p class="card-text small">
+                                    <strong>ml_prediction.py</strong> - Advanced ML models including:
+                                    <ul class="small">
+                                        <li>Random Forest for anomaly classification</li>
+                                        <li>Temperature prediction models</li>
+                                        <li>Model training and evaluation</li>
+                                        <li>Model persistence and loading</li>
+                                    </ul>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100 border-success">
+                            <div class="card-body">
+                                <h6 class="card-title text-success">
+                                    <i class="fas fa-project-diagram"></i> Sensor Fusion
+                                </h6>
+                                <p class="card-text small">
+                                    <strong>sensor_fusion.py</strong> - Multiple fusion algorithms:
+                                    <ul class="small">
+                                        <li>Weighted average fusion</li>
+                                        <li>Kalman filter fusion</li>
+                                        <li>Bayesian sensor fusion</li>
+                                        <li>Multi-sensor integration</li>
+                                    </ul>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100 border-warning">
+                            <div class="card-body">
+                                <h6 class="card-title text-warning">
+                                    <i class="fas fa-stream"></i> Real-Time Simulator
+                                </h6>
+                                <p class="card-text small">
+                                    <strong>real_time_simulator.py</strong> - Live data streaming:
+                                    <ul class="small">
+                                        <li>Real-time data generation</li>
+                                        <li>Streaming simulation</li>
+                                        <li>Batch data generation</li>
+                                        <li>CSV/JSON export</li>
+                                    </ul>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100 border-info">
+                            <div class="card-body">
+                                <h6 class="card-title text-info">
+                                    <i class="fas fa-server"></i> REST API
+                                </h6>
+                                <p class="card-text small">
+                                    <strong>api_server.py</strong> - Flask RESTful API:
+                                    <ul class="small">
+                                        <li>GET /api/data - Retrieve data</li>
+                                        <li>GET /api/stats - Statistics</li>
+                                        <li>POST /api/data - Add readings</li>
+                                        <li>GET /api/anomalies - Anomaly data</li>
+                                    </ul>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100 border-danger">
+                            <div class="card-body">
+                                <h6 class="card-title text-danger">
+                                    <i class="fas fa-bug"></i> Anomaly Detection
+                                </h6>
+                                <p class="card-text small">
+                                    <strong>anomaly_detection.py</strong> - Multiple algorithms:
+                                    <ul class="small">
+                                        <li>Z-Score method</li>
+                                        <li>Isolation Forest</li>
+                                        <li>Local Outlier Factor (LOF)</li>
+                                        <li>Method comparison</li>
+                                    </ul>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100 border-secondary">
+                            <div class="card-body">
+                                <h6 class="card-title text-secondary">
+                                    <i class="fas fa-chart-line"></i> Data Analysis
+                                </h6>
+                                <p class="card-text small">
+                                    <strong>analyze_sensors.py</strong> - Comprehensive analysis:
+                                    <ul class="small">
+                                        <li>Statistical analysis</li>
+                                        <li>Temporal patterns</li>
+                                        <li>Device comparisons</li>
+                                        <li>Correlation analysis</li>
+                                    </ul>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <div class="container text-center">
+            <p class="mb-2">
+                <strong>IoT Sensor Dataset</strong> - Created by 
+                <a href="https://rskworld.in" target="_blank">RSK World</a>
+            </p>
+            <p class="text-muted small mb-0">
+                Email: <a href="mailto:help@rskworld.in">help@rskworld.in</a> | 
+                Phone: <a href="tel:+919330539277">+91 93305 39277</a> | 
+                Website: <a href="https://rskworld.in" target="_blank">rskworld.in</a>
+            </p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Sample data generation
+        function generateSampleData() {
+            const devices = ['DEV001', 'DEV002', 'DEV003', 'DEV004', 'DEV005'];
+            const data = [];
+            const now = new Date();
+            
+            for (let i = 0; i < 100; i++) {
+                const timestamp = new Date(now - (100 - i) * 60000); // Every minute
+                const deviceId = devices[Math.floor(Math.random() * devices.length)];
+                const temp = 20 + Math.random() * 15 + (Math.random() > 0.9 ? 10 : 0); // Occasional spike
+                const humidity = 40 + Math.random() * 40;
+                const pressure = 980 + Math.random() * 40;
+                const motion = Math.random() > 0.7 ? 1 : 0;
+                const anomaly = (temp > 32 || humidity < 20 || pressure < 990) ? 1 : 0;
+                
+                data.push({
+                    timestamp: timestamp.toISOString(),
+                    device_id: deviceId,
+                    temperature: parseFloat(temp.toFixed(2)),
+                    humidity: parseFloat(humidity.toFixed(2)),
+                    pressure: parseFloat(pressure.toFixed(2)),
+                    motion: motion,
+                    anomaly: anomaly
+                });
+            }
+            return data;
+        }
+
+        const sensorData = generateSampleData();
+
+        // Update statistics
+        document.getElementById('totalReadings').textContent = sensorData.length;
+        document.getElementById('totalDevices').textContent = new Set(sensorData.map(d => d.device_id)).size;
+        const avgTemp = sensorData.reduce((sum, d) => sum + d.temperature, 0) / sensorData.length;
+        document.getElementById('avgTemp').textContent = avgTemp.toFixed(1) + '°C';
+        document.getElementById('anomalies').textContent = sensorData.filter(d => d.anomaly === 1).length;
+
+        // Temperature & Humidity Chart
+        const tempHumidityCtx = document.getElementById('tempHumidityChart').getContext('2d');
+        new Chart(tempHumidityCtx, {
+            type: 'line',
+            data: {
+                labels: sensorData.map(d => new Date(d.timestamp).toLocaleTimeString()),
+                datasets: [{
+                    label: 'Temperature (°C)',
+                    data: sensorData.map(d => d.temperature),
+                    borderColor: 'rgb(255, 99, 132)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    yAxisID: 'y'
+                }, {
+                    label: 'Humidity (%)',
+                    data: sensorData.map(d => d.humidity),
+                    borderColor: 'rgb(54, 162, 235)',
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    yAxisID: 'y1'
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        type: 'linear',
+                        position: 'left',
+                        title: { display: true, text: 'Temperature (°C)' }
+                    },
+                    y1: {
+                        type: 'linear',
+                        position: 'right',
+                        title: { display: true, text: 'Humidity (%)' },
+                        grid: { drawOnChartArea: false }
+                    }
+                }
+            }
+        });
+
+        // Pressure Chart
+        const pressureCtx = document.getElementById('pressureChart').getContext('2d');
+        new Chart(pressureCtx, {
+            type: 'line',
+            data: {
+                labels: sensorData.map(d => new Date(d.timestamp).toLocaleTimeString()),
+                datasets: [{
+                    label: 'Pressure (hPa)',
+                    data: sensorData.map(d => d.pressure),
+                    borderColor: 'rgb(75, 192, 192)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        title: { display: true, text: 'Pressure (hPa)' }
+                    }
+                }
+            }
+        });
+
+        // Device Distribution Chart
+        const deviceCtx = document.getElementById('deviceChart').getContext('2d');
+        const deviceCounts = {};
+        sensorData.forEach(d => {
+            deviceCounts[d.device_id] = (deviceCounts[d.device_id] || 0) + 1;
+        });
+        new Chart(deviceCtx, {
+            type: 'doughnut',
+            data: {
+                labels: Object.keys(deviceCounts),
+                datasets: [{
+                    data: Object.values(deviceCounts),
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.8)',
+                        'rgba(54, 162, 235, 0.8)',
+                        'rgba(255, 206, 86, 0.8)',
+                        'rgba(75, 192, 192, 0.8)',
+                        'rgba(153, 102, 255, 0.8)'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true
+            }
+        });
+
+        // Anomaly Chart
+        const anomalyCtx = document.getElementById('anomalyChart').getContext('2d');
+        const anomalyData = sensorData.map((d, index) => ({
+            x: index,
+            y: d.temperature,
+            anomaly: d.anomaly,
+            timestamp: new Date(d.timestamp).toLocaleTimeString()
+        }));
+        new Chart(anomalyCtx, {
+            type: 'scatter',
+            data: {
+                datasets: [{
+                    label: 'Normal',
+                    data: anomalyData.filter(d => d.anomaly === 0).map(d => ({x: d.x, y: d.y})),
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)'
+                }, {
+                    label: 'Anomaly',
+                    data: anomalyData.filter(d => d.anomaly === 1).map(d => ({x: d.x, y: d.y})),
+                    backgroundColor: 'rgba(255, 99, 132, 0.6)'
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        type: 'linear',
+                        title: { display: true, text: 'Reading Index' }
+                    },
+                    y: {
+                        title: { display: true, text: 'Temperature (°C)' }
+                    }
+                }
+            }
+        });
+
+        // Populate table
+        const tableBody = document.getElementById('tableBody');
+        sensorData.slice(0, 20).forEach(row => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${new Date(row.timestamp).toLocaleString()}</td>
+                <td>${row.device_id}</td>
+                <td>${row.temperature.toFixed(2)}</td>
+                <td>${row.humidity.toFixed(2)}</td>
+                <td>${row.pressure.toFixed(2)}</td>
+                <td><span class="badge ${row.motion ? 'bg-success' : 'bg-secondary'}">${row.motion ? 'Yes' : 'No'}</span></td>
+                <td><span class="badge ${row.anomaly ? 'bg-danger' : 'bg-success'}">${row.anomaly ? 'Yes' : 'No'}</span></td>
+            `;
+            tableBody.appendChild(tr);
+        });
+    </script>
+</body>
+</html>
+
